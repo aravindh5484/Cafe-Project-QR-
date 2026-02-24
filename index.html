@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ARA CAFE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="logo">ARA CAFE</div>
+
+    <ul class="nav-links">
+        <li><a href="#" class="active">HOME</a></li>
+        <li><a href="#">DELIGHTS</a></li>
+        <li><a href="#">OUR STORY</a></li>
+        <li><a href="#">OUR CAFE</a></li>
+        <li><a href="#">BLOGS</a></li>
+        <li><a href="#">CONTACT US</a></li>
+    </ul>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <img src="back.jpg" class="hero-img">
+
+    <div class="hero-text">
+        <h1>ARA CAFE</h1>
+        <div class="hero-divider"></div>
+        <p>Where Aroma Meets Comfort</p>
+    </div>
+</section>
+
+<!-- MENU SECTION -->
+<section class="container">
+    <h2 class="section-title">Our Special Menu</h2>
+
+    <div class="menu">
+        <div class="card">
+    <img src="coffee2.jpg">
+    <h3>Cappuccino</h3>
+    <p>₹100</p>
+    <button class="cart-btn" onclick="addToCart('Cappuccino',100)">
+        Add to Cart
+    </button>
+</div>
+
+<div class="card">
+    <img src="burger.jpg">
+    <h3>Cheese Burger</h3>
+    <p>₹150</p>
+    <button class="cart-btn" onclick="addToCart('Cheese Burger',150)">
+        Add to Cart
+    </button>
+</div>
+
+<div class="card">
+    <img src="pizza.jpg">
+    <h3>Farmhouse Pizza</h3>
+    <p>₹200</p>
+    <button class="cart-btn" onclick="addToCart('Farmhouse Pizza',200)">
+        Add to Cart
+    </button>
+</div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <h3>ARA CAFE</h3>
+    <p>Open Daily | 8 AM - 10 PM</p>
+    <p>© 2026 ARA CAFE</p>
+</footer>
+<script>
+function addToCart(name, price) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    cart.push({ name: name, price: price });
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    alert(name + " added to kitchen!");
+}
+</script>
+<script>
+function addToCart(name, price) {
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    let existingItem = cart.find(item => item.name === name);
+
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({
+            name: name,
+            price: price,
+            quantity: 1,
+            time: new Date().toLocaleTimeString()
+        });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    alert(name + " added to kitchen!");
+}
+</script>
+
+</body>
+</html> 
