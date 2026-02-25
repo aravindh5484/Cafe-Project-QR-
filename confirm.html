@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order Confirmation</title>
+</head>
+<body>
+  <h1>Your Order</h1>
+  <div id="orderDetails"></div>
+  <p id="status">Waiting for kitchen...</p>
+
+  <script>
+  let orderId = new URLSearchParams(window.location.search).get("orderId");
+  let lastStatus = "";
+
+  function renderOrder() {
+      let orders = JSON.parse(localStorage.getItem("orders")) || [];
+      let order = orders.find(o => o.id === orderId);
+
+      if (order) {
+          document.getElementById("orderDetails").innerHTML = `
+              <h3>Order ID: ${order.id}</h3>
+              <p>Table: ${order.table}</p>
+              <ul>
+                ${order.items.map(i => `
+                  <li>
+                    <img src="${i.img}" style="width:60px;height:60px;border-radius:8px;">
+                    ${i.name} - ₹${i.price} x ${i.quantity}
+                  </li>`).join("")}
+              </ul>
+          `;
+          document.getElementById("status").textContent = "Status: " + order.status;
+
+          if (order.status !== lastStatus) {
+              notifyUser("Your order is now " + order.status);
+              lastStatus = order.status;
+          }
+      }
+  }
+
+  function notifyUser(message) {
+      if (Notification.permission === "granted") {
+          new Notification(message);
+      } else if (Notification.permission !== "denied") {
+          Notification.requestPermission().then(permission => {
+              if (permission === "granted") {
+                  new Notification(message);
+              }
+          });
+      }
+  }
+
+  setInterval(renderOrder, 3000);
+  </script>
+</body>
+</html>
