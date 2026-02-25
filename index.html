@@ -20,6 +20,7 @@
     </ul>
 </nav>
 
+
 <!-- HERO SECTION -->
 <section class="hero">
     <img src="back.jpg" class="hero-img">
@@ -83,27 +84,40 @@ function addToCart(name, price) {
 }
 </script>
 <script>
-function addToCart(name, price) {
+    <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-8x0CvDuzZSnmFiGpS0ACWNxLyXTSR6o",
+    authDomain: "cafe-qr-d7e46.firebaseapp.com",
+    databaseURL: "https://cafe-qr-d7e46-default-rtdb.firebaseio.com",
+    projectId: "cafe-qr-d7e46",
+    storageBucket: "cafe-qr-d7e46.appspot.com",
+    messagingSenderId: "385220841895",
+    appId: "1:385220841895:web:8f9ac9e4003054f4dba682",
+    measurementId: "G-TWZRE4Z7V9"
+  };
 
-    let existingItem = cart.find(item => item.name === name);
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({
-            name: name,
-            price: price,
-            quantity: 1,
-            time: new Date().toLocaleTimeString()
-        });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-    alert(name + " added to kitchen!");
+  // Your existing addToCart function goes here
+</script>
+function addToCart(name, price, img) {
+  let table = new URLSearchParams(window.location.search).get("table") || 1;
+  let newOrder = {
+    id: "ORD" + Date.now(),
+    table: table,
+    items: [{ name, price, quantity: 1, img }],
+    time: new Date().toLocaleTimeString(),
+    status: "Pending"
+  };
+  db.ref("orders/" + newOrder.id).set(newOrder);  // ✅ writes to Firebase
+  window.location.href = "confirm.html?orderId=" + newOrder.id;
 }
+
 </script>
 
 </body>

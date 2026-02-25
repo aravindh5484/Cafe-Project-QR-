@@ -1,6 +1,9 @@
+
 <!DOCTYPE html>
 <html>
 <head>
+ 
+
     <title>Kitchen Orders</title>
     <style>
         body {
@@ -54,11 +57,34 @@
     </style>
 </head>
 <body>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-8x0CvDuzZSnmFiGpS0ACWNxLyXTSR6o",
+    authDomain: "cafe-qr-d7e46.firebaseapp.com",
+    databaseURL: "https://cafe-qr-d7e46-default-rtdb.firebaseio.com",
+    projectId: "cafe-qr-d7e46",
+    storageBucket: "cafe-qr-d7e46.appspot.com",
+    messagingSenderId: "385220841895",
+    appId: "1:385220841895:web:8f9ac9e4003054f4dba682",
+    measurementId: "G-TWZRE4Z7V9"
+  };
+
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Your kitchen dashboard code goes here
+</script>
+</body>
+</html>
 
 <h1>Kitchen Orders</h1>
 <div id="orders"></div>
 <button class="clear-btn" onclick="clearOrders()">Clear Orders</button>
-
+ 
 <script>
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
