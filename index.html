@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ARA CAFE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="logo">ARA CAFE</div>
+
+    <ul class="nav-links">
+        <li><a href="#" class="active">HOME</a></li>
+        <li><a href="#">DELIGHTS</a></li>
+        <li><a href="#">OUR STORY</a></li>
+        <li><a href="#">OUR CAFE</a></li>
+        <li><a href="#">BLOGS</a></li>
+        <li><a href="#">CONTACT US</a></li>
+    </ul>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <img src="back.jpg" class="hero-img">
+    <div class="hero-text">
+        <h1>ARA CAFE</h1>
+        <div class="hero-divider"></div>
+        <p>Where Aroma Meets Comfort</p>
+    </div>
+</section>
+
+<!-- MENU SECTION -->
+<section class="container">
+    <h2 class="section-title">Our Special Menu</h2>
+
+    <div class="menu">
+
+        <div class="card">
+            <img src="coffee2.jpg">
+            <h3>Cappuccino</h3>
+            <p>₹100</p>
+            <button class="cart-btn" onclick="addToCart('Cappuccino',100)">
+                Add to Cart
+            </button>
+        </div>
+
+        <div class="card">
+            <img src="burger.jpg">
+            <h3>Cheese Burger</h3>
+            <p>₹150</p>
+            <button class="cart-btn" onclick="addToCart('Cheese Burger',150)">
+                Add to Cart
+            </button>
+        </div>
+
+        <div class="card">
+            <img src="pizza.jpg">
+            <h3>Farmhouse Pizza</h3>
+            <p>₹200</p>
+            <button class="cart-btn" onclick="addToCart('Farmhouse Pizza',200)">
+                Add to Cart
+            </button>
+        </div>
+
+    </div>
+
+    <div style="text-align:center; margin-top:30px;">
+        <button onclick="sendOrder()" 
+            style="padding:12px 30px; font-size:18px; background:black; color:white; border:none; cursor:pointer;">
+            PLACE ORDER
+        </button>
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <h3>ARA CAFE</h3>
+    <p>Open Daily | 8 AM - 10 PM</p>
+    <p>© 2026 ARA CAFE</p>
+</footer>
+
+<!-- Firebase Script -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBbAPaV1M2c43QFQKSgMjes8jFuEN3ZTDs",
+  authDomain: "ara-cafe.firebaseapp.com",
+  databaseURL: "https://ara-cafe-default-rtdb.firebaseio.com/",
+  projectId: "ara-cafe",
+  storageBucket: "ara-cafe.firebasestorage.app",
+  messagingSenderId: "1061813484998",
+  appId: "1:1061813484998:web:cef94e2ed6c9e178c346c7"
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+let currentOrderId = null;
+
+// ADD TO CART
+window.addToCart = function(name, price) {
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    let existingItem = cart.find(item => item.name === name);
+
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({
+            name: name,
+            price: price,
+            quantity: 1
+        });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    alert(name + " added to cart!");
+};
+
+// SEND ORDER
+window.sendOrder = function() {
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    if (cart.length === 0) {
+        alert("Cart is empty!");
+        return;
+    }
+
+    let total = 0;
+    cart.forEach(item => {
+        total += item.price * item.quantity;
+    });
+
+    const ordersRef = ref(database, "orders");
+    const newOrderRef = push(ordersRef);
+
+    currentOrderId = newOrderRef.key;
+
+    set(newOrderRef, {
+        table: "Table 1",
+        items: cart,
+        total: total,
+        status: "Pending",
+        createdAt: Date.now()
+    });
+
+    localStorage.removeItem("cart");
+
+    listenForStatus(currentOrderId);
+
+    alert("Order sent to kitchen 🔥");
+};
+
+// LISTEN FOR READY STATUS
+function listenForStatus(orderId) {
+
+    const orderRef = ref(database, "orders/" + orderId);
+
+    onValue(orderRef, (snapshot) => {
+        const data = snapshot.val();
+
+        if (data && data.status === "Ready") {
+            alert("🎉 Your Order is Ready! Please collect it.");
+        }
+    });
+}
+
+</script>
+
+</body>
+</html>
