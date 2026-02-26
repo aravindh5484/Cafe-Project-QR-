@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kitchen Orders</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #111;
+            color: white;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .order-card {
+            background: #222;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid orange;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 6px 12px;
+            margin-top: 8px;
+            margin-right: 6px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .prepare { background: orange; color: black; }
+        .ready { background: green; color: white; }
+        .delete { background: red; color: white; }
+    </style>
+</head>
+<body>
+
+<h1>🔥 Kitchen Orders</h1>
+<div id="orders"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBbAPaV1M2c43QFQKSgMjes8jFuEN3ZTDs",
+  authDomain: "ara-cafe.firebaseapp.com",
+  databaseURL: "https://ara-cafe-default-rtdb.firebaseio.com/",
+  projectId: "ara-cafe",
+  storageBucket: "ara-cafe.firebasestorage.app",
+  messagingSenderId: "1061813484998",
+  appId: "1:1061813484998:web:cef94e2ed6c9e178c346c7"
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+const ordersRef = ref(database, "orders");
+const ordersDiv = document.getElementById("orders");
+
+// LIVE LISTENER
+onValue(ordersRef, (snapshot) => {
+
+    ordersDiv.innerHTML = "";
+
+    if (!snapshot.exists()) {
+        ordersDiv.innerHTML = "<p>No active orders.</p>";
+        return;
+    }
+
+    snapshot.forEach((childSnapshot) => {
+
+        const order = childSnapshot.val();
+        const orderId = childSnapshot.key;
+
+        const div = document.createElement("div");
+        div.classList.add("order-card");
+
+        let itemsList = "";
+        order.items.forEach(item => {
+            itemsList += `<li>${item.name} x${item.quantity}</li>`;
+        });
+
+        div.innerHTML = `
+            <h3>${order.table}</h3>
+            <ul>${itemsList}</ul>
+            <p><strong>Total:</strong> ₹${order.total}</p>
+            <p><strong>Status:</strong> ${order.status}</p>
+
+            <button class="prepare" onclick="updateStatus('${orderId}', 'Preparing')">
+                Preparing
+            </button>
+
+            <button class="ready" onclick="updateStatus('${orderId}', 'Ready')">
+                Ready
+            </button>
+
+            <button class="delete" onclick="deleteOrder('${orderId}')">
+                Clear Order
+            </button>
+        `;
+
+        ordersDiv.appendChild(div);
+    });
+});
+
+// UPDATE STATUS
+window.updateStatus = function(orderId, newStatus) {
+    update(ref(database, "orders/" + orderId), {
+        status: newStatus
+    });
+};
+
+// DELETE ORDER
+window.deleteOrder = function(orderId) {
+    if (confirm("Are you sure you want to clear this order?")) {
+        remove(ref(database, "orders/" + orderId));
+    }
+};
+
+</script>
+
+</body>
+</html>
